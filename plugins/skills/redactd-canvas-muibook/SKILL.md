@@ -1,11 +1,11 @@
 ---
 name: redactd-canvas-muibook
-description: Create Muibook UI on an active Redactd canvas from Antigravity Browser or Codex Browser. Pair with the lightweight muibook-components skill for component knowledge without requiring the Redactd Canvas plugin, API backend, or Muibook Knowledge MCP; use those as optional richer paths when available.
+description: Create Muibook UI on an active Redactd canvas from Antigravity Browser. Pair with the lightweight muibook-components skill for component knowledge without requiring the Redactd Canvas plugin, API backend, or Muibook Knowledge MCP; use those as optional richer paths when available.
 ---
 
 # Redactd Canvas: Muibook
 
-Use this skill when the user asks Antigravity or Codex to create, add, send, or modify Muibook UI on a Redactd canvas. The default lightweight path pairs this skill with `muibook-components` and uses an already-open Redactd canvas in Antigravity Browser or Codex Browser.
+Use this skill when the user asks Antigravity to create, add, send, or modify Muibook UI on a Redactd canvas. The default lightweight path pairs this skill with `muibook-components` and uses an already-open Redactd canvas in Antigravity Browser.
 
 This skill can independently create basic layouts with the core components documented below. Pair
 it with `muibook-components` for the recommended lightweight workflow and broader component,
@@ -123,7 +123,7 @@ For a native Muibook tag not already shown in a selected composition:
 
 ## Independent Core
 
-Without `muibook-components`, use only this compact core for basic layouts:
+When operating standalone without access to `assets/muibook-knowledge/`, `muibook-components`, or an active MCP server, use this compact core for basic layouts:
 
 - `Container`: `center`, `size`, `style`.
 - `Card` with a direct `CardBody` child; `CardBody`: `size`, `style`.
@@ -135,36 +135,20 @@ Without `muibook-components`, use only this compact core for basic layouts:
   `name`, `value`, `size`.
 - `Badge`: `text`, `variant`, `size`; `_Icon`: `icon`, `size`, `color`, `slot`.
 
-This core is an intentionally small snapshot of the working Muibook MCP tree rules, not a separate
-component schema.
+This core is an intentionally small snapshot of working tree rules, not a separate component schema.
 
-If a request needs components or props outside this core, recommend installing
-`muibook-components`. The Muibook Knowledge MCP and full Redactd Canvas plugin remain optional
-richer paths.
+If a request needs components or props outside this core and local plugin assets (`assets/muibook-knowledge/`) are not available, recommend installing `muibook-components`.
 
 ## Knowledge Routing
 
 Choose the available Muibook knowledge source before building the tree:
 
-The standalone pair is the default lightweight route. If the working Muibook Knowledge MCP is
-available, treat its current rules and component lookups as authoritative over either standalone
-skill's embedded snapshot.
+1. **Bundled Plugin Knowledge Assets (Primary in Redactd Canvas Plugin):** When running in or alongside the Redactd Canvas plugin, inspect the local asset files in `assets/muibook-knowledge/` (such as `assets/muibook-knowledge/skills/muibook-components/SKILL.md`, `custom-elements.json`, `compositions.ts`, `json-rules.ts`, and `DESIGN.md`). Use these files directly for comprehensive component, attribute, slot, token, and composition knowledge.
+2. **Lightweight Skill Pair:** When using this skill standalone outside the plugin repository, prefer the installed `muibook-components` skill for component, public attribute, slot, token, and composition references.
+3. **Muibook MCP & Redactd API Tools:** If the working Muibook Knowledge MCP is available, call its `start_here` tool and use its rules, compositions, component lookup, and dynamic attrs as needed. In the full plugin, if `get_redactd_component_knowledge` is available, call it with `format: "summary"`. Treat a newer MCP or API version as authoritative over static local files.
+4. **Independent Core (Last-resort fallback):** If operating standalone without access to `assets/muibook-knowledge/`, `muibook-components`, or active MCP/API tools, use this skill's Independent Core above for basic layouts.
 
-1. **Lightweight skill pair:** Prefer the installed `muibook-components` skill for the standalone
-   Codex workflow. Use its component, public attribute, slot, token, and selected composition
-   references when building the tree.
-2. **Independent core:** If `muibook-components` is unavailable, use only this skill's Independent
-   Core for basic layouts.
-3. **Muibook MCP:** If richer or newer guidance is needed and the Muibook Knowledge MCP is
-   available, call its `start_here` tool, then use its rules, compositions, component lookup, and
-   dynamic attrs as needed. Treat a newer MCP version as authoritative.
-4. **Bundled Redactd knowledge:** In the full Redactd Canvas plugin, if
-   `get_redactd_component_knowledge` is available, call it with `format: "summary"`. This source
-   matches the Muibook version supported by that Redactd release.
-
-This skill alone supports the Independent Core. The two standalone skills plus Codex Browser are
-the recommended lightweight workflow. The Muibook Knowledge MCP, Redactd Canvas plugin, and API
-backend are optional.
+The bundled plugin assets or standalone skill pair plus Antigravity Browser provide the primary offline workflows. The Muibook Knowledge MCP, Redactd Canvas plugin API backend, and dynamic tools remain optional richer paths.
 
 ## Wireframe Interpretation
 
@@ -252,25 +236,25 @@ For `ComparisonChart`, populate Series with named datasets:
 
 Choose the transport before creating the UI:
 
-1. **Codex browser:** If the Browser skill is available and Codex can access an already-open
+1. **Antigravity browser:** If the Browser skill is available and Antigravity can access an already-open
    `redactd.xyz` canvas tab, use the browser paste workflow below. Do not ask for a Redactd API key.
 2. **API:** Otherwise, if `create_redactd_recipe` is available, use it as the headless, automated,
    and non-browser fallback. It requires a Redactd API key.
 3. **Unavailable:** If neither browser access nor `create_redactd_recipe` is available, explain that
-   the user must open Redactd in the Codex browser or install the full Redactd Canvas plugin.
+   the user must open Redactd in the browser or install the full Redactd Canvas plugin.
 
-Do not call the API first when an accessible Redactd canvas is already open in the Codex browser.
+Do not call the API first when an accessible Redactd canvas is already open in the browser.
 The MCP server is intentionally API-only; browser availability is decided by the skill and the
-Codex host.
+agent host.
 
 ## Shared Workflow
 
 1. Select the knowledge source using Knowledge Routing above.
 2. Build and validate a Redactd component tree against the Redactd Tree Contract.
-3. Follow the Codex Browser workflow by default, or the API workflow only when browser transport
+3. Follow the Antigravity Browser workflow by default, or the API workflow only when browser transport
    is unavailable.
 
-## Codex Browser Workflow
+## Antigravity Browser Workflow
 
 1. Use the Browser skill and claim the already-open `redactd.xyz` tab. Do not open a duplicate tab.
 2. Serialize the tree with `JSON.stringify(tree)` and write it to the browser tab clipboard.
