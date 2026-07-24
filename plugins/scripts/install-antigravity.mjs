@@ -63,4 +63,16 @@ for (const tool of TOOL_DEFINITIONS) {
   console.log(`✓ Created MCP tool schema: ${tool.name}.json`);
 }
 
+const instructionsContent = `# Redactd Canvas MCP Server
+
+Provides tools to query Redactd canvas context, retrieve component knowledge, and queue component trees directly to redactd.xyz via API.
+
+## Available Tools
+- create_redactd_recipe: Queue a Redactd component tree into active canvas. Requires tree and optional apiKey.
+- get_redactd_context: Query active canvas library context.
+- get_redactd_component_knowledge: Retrieve bundled component registry schema.
+`;
+writeFileSync(resolve(antigravityMcpDir, 'instructions.md'), instructionsContent);
+console.log('✓ Created MCP instructions.md');
+
 console.log('✓ Successfully installed Redactd Canvas into Antigravity!');

@@ -200,6 +200,7 @@ export async function callTool(name, args) {
       method: 'POST',
       headers: {
         authorization: `Bearer ${apiKey}`,
+        'x-api-key': apiKey,
         'content-type': 'application/json'
       },
       body: JSON.stringify({

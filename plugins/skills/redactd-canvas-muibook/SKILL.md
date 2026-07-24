@@ -161,8 +161,10 @@ When a wireframe image is provided:
 5. Infer H Stack, V Stack, Grid, spacing, alignment, wrapping, and responsive direction from the spatial relationships between elements.
 6. Preserve repeated visual patterns as repeated component structures.
 7. Use a generic Muibook layout component when the intended component is ambiguous. Do not invent components or attributes.
-8. Treat rough colours, borders, and spacing as illustrative unless the wireframe explicitly annotates them as requirements.
-9. Produce a reasonable first pass without blocking on minor ambiguity. Ask for clarification only when uncertainty would materially change the workflow or component hierarchy.
+8. **No Hardcoded Canvas Colors or Tokens:** Treat white/light paper drawing canvas colors, outline colors, or sketch backgrounds purely as visual drawing artifacts—**NEVER** convert them to `var(--white)`, `#ffffff`, `white`, `color: black`, or hardcoded inline background styles. Hardcoding static white or light colors breaks Redactd's theme adaptation and dark mode.
+9. **Prefer Slat over Custom HStack:** For row-like wireframe items with primary text/label on the left and secondary metadata, status, timestamp, badge, count, or action button on the right, use `Slat` (or `SlatGroup` for repeated rows) with `slot="start"` and `slot="end"` instead of building an ad-hoc `HStack`. Always explicitly set `variant="row"` (or `"header"` / `"action"`) on `Slat`.
+10. **Use Drawer for Side Navigation & Panels:** When a wireframe or prompt shows a sidebar, side menu, collapsible filter panel, or slide-out overlay, use the `Drawer` component with `open` and `side` props rather than constructing a custom box or layout wrapper. Compose nav items inside `Drawer` using `Button` or `Link` with `variant="tertiary"`, `align="start"`, and a `slot="before"` `_Icon`.
+11. Produce a reasonable first pass without blocking on minor ambiguity. Ask for clarification only when uncertainty would materially change the workflow or component hierarchy.
 
 ## Muibook Chart Data
 
@@ -251,8 +253,7 @@ agent host.
 
 1. Select the knowledge source using Knowledge Routing above.
 2. Build and validate a Redactd component tree against the Redactd Tree Contract.
-3. Follow the Antigravity Browser workflow by default, or the API workflow only when browser transport
-   is unavailable.
+3. **Primary Automated Transport**: Always call `create_redactd_recipe` via the API tool to send the UI tree directly to Redactd and return the one-time `canvas_url`. Use browser paste only when explicitly requested by the user or when browser automation is actively attached. Do NOT instruct the user to manually copy/paste JSON files.
 
 ## Antigravity Browser Workflow
 
@@ -272,21 +273,17 @@ user's existing canvas content unless they explicitly asked to replace it.
 
 ## API Workflow
 
-1. Call `get_redactd_context` and confirm `library` is `muibook`.
-2. If the active library is `html-foundations`, use `redactd-canvas-html` instead. If it is
-   unsupported, report that custom libraries are unavailable through this plugin.
-3. Wrap the validated root tree as
-   `{ "tree": ..., "open_canvas": true, "library": "muibook" }` only for this API call.
-4. Call `create_redactd_recipe` with that wrapper.
-5. Tell the user the exact `canvas_url` returned by the tool. Do not rewrite it.
+1. **Check API Auth First**: At the very beginning of the request, check if `REDACTD_API_KEY` is present or if an API key was provided in the conversation. **If no API key is available, ASK FOR THE API KEY IMMEDIATELY AT THE START** before generating complex component trees or performing heavy layout work.
+2. Confirm `library` is `muibook`.
+3. Wrap the validated root tree as `{ "tree": ..., "open_canvas": true, "library": "muibook" }`.
+4. Call `create_redactd_recipe` with that wrapper and `apiKey`.
+5. Report the exact `canvas_url` returned by the tool.
 
 ## API Auth
 
-- Ask for an API key only after selecting the API workflow.
-- If no API key is already available, ask the user for their Redactd API key and pass it as `apiKey`.
-- Tell the user they can find it in Redactd at Profile > Settings or Team Settings > Account Settings > API Key.
-- For automated or local development use, `REDACTD_API_KEY` in the plugin environment is also supported.
-- Do not include `workspace_id`; Redactd resolves the active workspace from the API key.
+- **ASK AT THE START**: If no API key is set in `REDACTD_API_KEY` or passed in the conversation, **ASK THE USER FOR THEIR REDACTD API KEY IMMEDIATELY FIRST** before building or running any script.
+- Tell the user they can find it in Redactd at **Profile > Settings** or **Team Settings > Account Settings > API Key**.
+- For automated or local development use, setting `REDACTD_API_KEY` in the shell environment (`export REDACTD_API_KEY="rdx_..."`) is supported to bypass all prompts.
 
 ## Tree Rules
 
@@ -306,6 +303,9 @@ user's existing canvas content unless they explicitly asked to replace it.
 - Prefer `Responsive` with `variant: "container"` for reusable components and compositions so the
   layout follows its available parent region. Use viewport responsiveness only for page-level or
   app-shell decisions that genuinely depend on browser width.
+- **No Hardcoded White/Light Surface Colors:** NEVER output `var(--white)`, `style: "background: white"`, `#ffffff`, or `color: black` based on visual wireframe image backgrounds. All component surface and text styling must be driven by Redactd component variants (`variant: "primary"`, `variant: "secondary"`, `variant: "tertiary"`, etc.) and semantic design tokens so layouts adapt seamlessly to both light and dark mode.
+- **Slat vs. HStack Rule:** Use `Slat` and `SlatGroup` for horizontal list items, settings rows, metadata feeds, transaction lists, and activity rows. Do not substitute `HStack` when a `Slat` item contract fits. Always set `variant="row"` (or `"header"` / `"action"`) explicitly on `Slat`.
+- **Drawer Component Enforce Rule:** For sidebar menus, app drawers, side filters, or slide-out panels, use the native `Drawer` component (`open: true`, `side: "left"` or `"right"`). Use `variant="tertiary"` Buttons/Links with `slot="before"` icons inside `Drawer`. Do not invent custom layout wrappers for drawers or sidebars.
 - Avoid `Message` for inline helper text, form help, mid-content notes, or routine status copy. Use `FormMessage` inside forms, or `Body` with `variant: "info"` and an `_Icon` with `slot: "before"` for lightweight informational copy. Reserve `Message` for persistent page-level notices with a short heading and slotted body copy.
 
 ## Response
