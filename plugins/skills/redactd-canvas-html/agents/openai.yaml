@@ -1,0 +1,4 @@
+interface:
+  display_name: "Redactd Canvas HTML"
+  short_description: "Build semantic HTML on a Redactd canvas"
+  default_prompt: "Use $redactd-canvas-html to build a semantic HTML interface on my Redactd canvas."

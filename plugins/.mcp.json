@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "redactd-canvas": {
+      "command": "node",
+      "cwd": ".",
+      "args": [
+        "./src/index.js"
+      ]
+    }
+  }
+}

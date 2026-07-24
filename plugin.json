@@ -1,0 +1,21 @@
+{
+  "name": "redactd-canvas",
+  "version": "0.1.0",
+  "description": "Prompt UI from Antigravity to redactd.xyz.",
+  "author": {
+    "name": "Redactd",
+    "url": "https://redactd.xyz"
+  },
+  "homepage": "https://redactd.xyz",
+  "license": "LicenseRef-Redactd-Proprietary",
+  "keywords": [
+    "redactd",
+    "antigravity",
+    "codex",
+    "canvas",
+    "ui-builder",
+    "components"
+  ],
+  "skills": "./plugins/skills/",
+  "mcpServers": "./.mcp.json"
+}
