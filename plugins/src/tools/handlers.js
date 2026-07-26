@@ -30,7 +30,7 @@ async function readKnowledge() {
     await Promise.all([
       readJson(join(KNOWLEDGE_DIR, 'custom-elements.json')),
       readJson(join(KNOWLEDGE_DIR, 'dynamic-attrs.json')),
-      readText(join(KNOWLEDGE_DIR, 'rules.ts')),
+      readText(join(KNOWLEDGE_DIR, 'json-rules.ts')),
       readText(join(KNOWLEDGE_DIR, 'compositions.ts')),
       readText(join(KNOWLEDGE_DIR, 'keywords.ts')),
       readText(join(KNOWLEDGE_DIR, 'DESIGN.md'))
