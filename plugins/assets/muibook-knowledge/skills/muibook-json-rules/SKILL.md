@@ -36,7 +36,7 @@ CRITICAL RULES:
 6. Container components can have children.
 7. Leaf components use children: [].
 8. Props must match the component API.
-9. Root additions use Container with center=true and size=medium.
+9. Root additions normally use Container with center=true and size=medium. A Drawer-only app shell may use Drawer as the root. When a global top header spans above a Drawer region, use a zero-space VStack shell with HeaderBar first and Drawer second. If Drawer width is explicit, preserve that value on Drawer and apply the same value to HeaderBar left-width; follow the Header Bar With Drawer Region fragment and its Header Bar Composition Density Guide.
 10. Button and Link text stays on the component; do not wrap in Body.
 11. Put visual backgrounds on layout style or SmartCard bg props.
 12. SmartCard props use kebab-case: bg-image, bg-color, logo-height.
@@ -49,23 +49,25 @@ CRITICAL RULES:
 19. Prefer Responsive variant=container for reusable components and compositions so they react to available parent space. Use viewport responsiveness only for page-level or app-shell decisions that genuinely depend on the browser viewport.
 20. Card does not have a width size scale. Card width comes from its Grid, HStack, Container, parent layout, or an explicit style when a constrained reading or form width is required. Set the size attribute on Card to propagate internal padding density to its direct CardHeader, CardBody, and CardFooter sections: medium is the default, small is compact, large is spacious, and none is edge-to-edge. Set size directly on an individual section only when Card has no size. Card-aware Tables, Accordions, and Slats remain edge-to-edge inside CardBody and inherit the per-size content inset. This inherited inset is alignment behavior, not a recommendation to derive the child component size from Card size. Choose Table, Accordion, or Slat density from the content, available width, readability, and touch-target needs. Treat Card Body size-offset stories as diagnostic references rather than canonical compositions. Medium is the safe default for complete Slat groups; avoid none or small Cards for them unless the content has been validated. Tables and Accordions can work across Card sizes when their content remains usable. A ButtonGroup inside CardFooter removes top padding while preserving size-aware inline and bottom spacing. Use usage="grid" on repeated Cards in Grid, or usage="h-stack" in an HStack with aligny="stretch", when their headers and footers should align; direct children retain document order, CardBody receives the flexible row, and composed elements such as Rule remain auto-sized. Repeated Cards should normally receive width from their parent layout rather than individual Card width styles.
 21. For repeated Card clusters in a Grid, set usage="grid" on each Card. For a two-up HStack, set aligny="stretch" on HStack and usage="h-stack" on each Card. Size Card padding to column density: 1-up leaves Card size unset (default medium); 2-up leaves size unset (medium) on larger widths, adjusting down via Responsive at smaller breakpoints if needed; 3-up uses size="small"; 4-up uses size="small", or size="none" with custom padding via a space token (e.g. var(--space-300)) when edge-to-edge control is required.
-22. In Drawer navigation, compose nav items as Button or Link with align="start", variant="tertiary" as the default (non-prominent) emphasis, and a slot="before" _Icon matching the item's meaning.
+22. In Drawer navigation and sidebar action groups, compose nav items as Button or Link with align="start", variant="tertiary" as the default (non-prominent) emphasis, a slot="before" _Icon matching the item's meaning, and set gap="var(--space-200)" on medium-sized buttons (or size-proportional space tokens) for optimal icon-to-label spacing.
 23. When composing Muibook charts in Redactd, populate the structured Data field through props.data, or the Series field through props.series for ComparisonChart. Redactd owns passing that value to the Muibook component. FinancialChart uses { time, open, high, low, close, volume? }. MarketSparkline and FinancialBarChart use { time, value }. ComparisonChart uses { id, label, color?, data: [{ time, value }] }. Use finite JSON numbers, unique chronological times, and coherent illustrative values. FinancialChart high/low values must contain open and close. ComparisonChart series ids must be unique; indexed and percent modes receive raw values with a non-zero first value. Follow the Structured Chart Data section for component-specific structures and examples.
 24. Use slots for content projection, not as the only control for significant chrome or layout decisions in generated/editor output. When a component exposes an explicit public attr such as hide-header, use that attr instead of relying only on omitted or present slotted content. Runtime attrs such as has-header and has-footer are dynamic metadata, not authored source props.
 25. Use col="1fr auto" as the default col for Slat. Do not invent a custom Slat column string from an image prompt unless the source clearly requires non-default column tracks; the default Slat columns are preferred for accessory/start/end compositions.
-26. For a single side drawer opened from a menu or hamburger icon, prefer Drawer variant="push" with open and side. The side property (left or right) should match the position of the menu icon trigger. Persistent drawers are for content that stays adjacent/visible and usually do not need a menu trigger. Push and persistent drawers use slot="page" for adjacent page content; left-open, right-open, left-width, right-width, and the left/right slots are workspace-only. Use workspace only for advanced editor or canvas shells with independent left/right panels around a central page.
+26. For a single side drawer opened from a menu or hamburger icon, prefer Drawer variant="push" with open and side. The side property (left or right) should match the position of the menu icon trigger. Persistent drawers are for content that stays adjacent/visible and usually do not need a menu trigger. Push and persistent drawers use slot="page" for adjacent page content; left-open, right-open, left-width, right-width, and the left/right slots are workspace-only. Use workspace only for advanced editor or canvas shells with independent left/right panels around a central page. Drawer is the root only when it owns the whole shell. If a global top header must remain full-width above it, make HeaderBar and Drawer siblings in a zero-space VStack root and size Drawer to the remaining shell height. Preserve an explicit Drawer width and copy it to HeaderBar left-width so the regions align; do not reconstruct HeaderBar with a Grid and manual height, border, or surface styles.
 27. CSS length props and style values must include valid units or CSS functions. For height, width, max-height, min-height, padding, margin, gap, and similar CSS lengths, output values such as "320px", "20rem", "100%", "100vh", "auto", or "var(--space-500)"; never output bare numeric strings such as "320" or "20" unless the component API explicitly documents a number scale for that prop.
 28. Prefer Slat over an ad hoc HStack for row-like wireframe items with primary content on the left and secondary metadata, value, status, timestamp, badge, count, or action on the right. Use SlatGroup for repeated rows such as activity feeds, settings rows, account details, notifications, transaction lists, project updates, search results, or compact records. Put primary content in slot="start" and trailing metadata/action in slot="end". Always explicitly set variant="row" on standard Slat items unless creating a section header (variant="header"), interactive row (variant="action"), or custom layout; Slat items inside SlatGroup or CardBody rely on explicit variant ("row", "header", or "action") for correct automatic alignment and card/group styles.
 29. For top-and-bottom positioning inside VStack (such as pushing a footer or action button to the bottom), set fill or height on VStack and apply style="align-self: end;" to the slotted child. Use fill when VStack sits inside a bounded parent (e.g. CardBody, Drawer, or Dialog); use height when specifying an explicit length (e.g. height="300px").
 30. Explicitly define layout boundaries to prevent unpredictable canvas rendering. For VStack and HStack, always output width="auto" and height="auto" unless a specific dimension or fill is required.
 31. For Grid, never leave col empty. It defaults to two columns (1fr 1fr), so omitting it can lead to unexpected layouts.
 32. For Dialog and Drawer, omit width and height properties to inherit their design system defaults (350px and 320px respectively) unless explicitly overriding them for a specific use case.
-33. When composing a user profile or avatar pattern, use AvatarChip (with image, label, and primary/secondary slotted Body) rather than constructing a custom avatar layout. If the profile pattern requires a menu or dropdown, wrap the AvatarChip inside a Button (with variant="secondary" and slot="action") inside a Dropdown, and use Menu with Buttons for the dropdown actions.
-34. Badge variants are exactly neutral, positive, warning, attention, and overlay. Never output Badge variant="secondary", variant="default", or variant="error". Omit variant for the default neutral treatment. Secondary remains valid for components that explicitly document it, such as Body or Button, but not Badge.
+33. When composing a user profile or avatar pattern, use AvatarChip rather than constructing a custom avatar layout. For profile menus, follow the Avatar Chip Profile Actions fragment: Dropdown contains an action Button plus a direct Menu; AvatarChip belongs inside Button. Secondary is a useful standalone treatment, while tertiary is the demonstrated quieter HeaderBar treatment.
+34. Every Badge must have a non-empty props.text string after trimming. Use a concise visible label; if no meaningful label is available, omit the Badge node entirely. Badge variants are exactly neutral, positive, warning, attention, and overlay. Never output Badge variant="secondary", variant="default", or variant="error". Omit variant for the default neutral treatment. Secondary remains valid for components that explicitly document it, such as Body or Button, but not Badge.
 35. Use Grid for repeated Cards, page regions, forms, and other primary layout structure. When a collection should naturally reduce its column count as its container narrows, use intrinsic tracks such as col="repeat(auto-fit, minmax(min(100%, 18rem), 1fr))" and choose the minimum width to suit the content. Use col="repeat(N, minmax(0, 1fr))" only when the requested number of columns must remain fixed.
 36. Use HStack wrap only for compact inline relationships such as actions, chips, metadata, legends, and small toolbar groups that remain meaningful across multiple horizontal lines. Wrapping does not turn HStack into VStack. Do not use a wrapping HStack as the default for main page regions, card collections, forms, or a deliberate horizontal-to-vertical layout change.
 37. When substantial side-by-side regions need a deliberate horizontal-to-vertical change based on available parent space, prefer a one-tree intrinsic Grid when the content can simply reflow. Use Responsive variant="container" with HStack in show-above and VStack in show-below only when the composition itself must change. Because the Responsive alternatives duplicate their child tree, do not use that swap for stateful controls, forms, duplicate ids, or content that must preserve one live instance; use a one-tree Grid or a purpose-built responsive component instead.
 38. Before assigning any _Icon, inspect the available Muibook icon component names in the selected component knowledge or Custom Elements Manifest and use an exact existing mui-icon-* name. If no available icon semantically matches the requested concept, use _Icon with props.icon="mui-icon-rectangle" as the neutral Redactd fallback. Never invent an icon component or icon name.
+39. When composing page header bars, top app toolbars, or drawer headers with icon-only action triggers (such as Menu toggle, Search, Settings, Notifications, or circular action triggers), set shape="circle" on Button and provide an accessible aria-label. Tertiary is a quiet default, secondary provides a clearer action boundary (commonly useful for badged notifications), and primary is reserved for standout actions. Treat the Header Bar Composition Density Guide as starting-point guidance rather than a fixed recipe.
+40. When embedding ComparisonChart or FinancialBarChart in a Card, use Card with size="none" and usage="grid", containing a direct child CardBody with size="none" wrapping the chart. Never use CardHeader or a table header above or inside the chart; ComparisonChart and FinancialBarChart provide their own native padded slot="header" region with divider strokes. Structure the chart header with an HStack (alignX="space-between", alignY="center", space="var(--space-300)"), placing the section Heading on the start/left and action controls (such as a small timeframe Dropdown with secondary Button trigger and Menu action items) on the end/right. Follow the Card-Embedded Comparison Chart fragment for the complete reference.
 
 ## MuiScan Normalization Rules
 
@@ -78,12 +80,14 @@ MUI SCAN NORMALIZATION RULES:
   - mui-button -> Button
   - mui-link -> Link
   - mui-input -> Input
+  - mui-color-input -> ColorInput
   - mui-select -> Select
   - mui-avatar-chip -> AvatarChip
   - mui-media-player -> MediaPlayer
   - mui-video-thumbnail -> VideoThumbnail
   - mui-model-viewer -> ModelViewer
   - mui-table -> Table
+  - mui-header-bar -> HeaderBar
   - mui-row-group -> RowGroup
   - mui-row -> Row
   - mui-cell -> Cell
@@ -91,11 +95,12 @@ MUI SCAN NORMALIZATION RULES:
   - mui-icon-[name] -> _Icon with props.icon = "mui-icon-[name]"
   - mui-illustration-[name] -> _Illustration with props.illustration = "mui-illustration-[name]"
 - Preserve hierarchy, spacing, slots, key props, and valid style strings
-- Preserve icon slots:
+- Preserve icon and badge slots:
   - slot=before -> props.slot = "before"
   - slot=after -> props.slot = "after"
+  - slot=badge -> props.slot = "badge" (notification badge anchored top-right on Button)
   - if an icon is the only child of Button, Link, or Chip, keep it as the default child
-- For Badge: valid output variants are neutral, positive, warning, attention, and overlay. Preserve neutral and never convert it to secondary. Omit variant for the default neutral treatment; do not output secondary, default, or error.
+- For Badge: always output a non-empty props.text string after trimming; omit the Badge if no meaningful visible label is available. Valid output variants are neutral, positive, warning, attention, and overlay. Use slot="badge" on Button for top-right notification indicators. Preserve neutral and never convert it to secondary. Omit variant for the default neutral treatment; do not output secondary, default, or error.
 
 TEXT NODE RULES FOR MUISCAN:
 - TEXT is input-only; collapse into the nearest valid Redactd text model
@@ -111,7 +116,7 @@ TEXT NODE RULES FOR MUISCAN:
   - consume direct TEXT into Span.props.text
   - keep inline children such as Link nested inside the same Span
 - Exceptions:
-  - mui-badge: consume TEXT as the badge's direct rendered text; preserve before/after slot children; do not invent Body
+  - mui-badge: consume non-empty TEXT as Badge.props.text; preserve before/after slot children; do not invent Body; omit the Badge rather than outputting it with missing, empty, or whitespace-only text
   - mui-status: consume TEXT as the status's direct rendered text; preserve before/after icon slot children; do not invent Body, Badge, or Message inside Status
   - mui-chip: consume TEXT as the chip's direct rendered text; preserve before/after slot children; do not invent Body
   - mui-alert: preserve variant/label, convert default content to Span, consume TEXT into Span.props.text, keep inline children such as Link, do not invent Body
@@ -135,33 +140,34 @@ SURFACES:
 - CardHeader: size (none|small|medium|large)
 - CardBody: size (none|small|medium|large), style. Size controls internal padding, not Card width; medium is the default, small is compact, large is spacious, and none is edge-to-edge. Card-aware Tables, Accordions, and Slats remain edge-to-edge and inherit their content inset from Card size. At size=none, Slats retain their standard internal row inset while SlatGroup disables its negative alignment offset so rows stay within the Card border. This inset is alignment behavior, not a requirement to derive child density from Card size. Choose child size from the content, available width, readability, and touch-target needs. Treat Card Body size-offset stories as diagnostic references rather than canonical compositions. Medium is the safe default for complete Slat groups; avoid none or small Cards for them unless the content has been validated. Tables and Accordions can work across Card sizes when their content remains usable. Do not set size by default for SlatGroup layouts; leave props empty unless the user explicitly requests a spacing size.
 - CardFooter: size (none|small|medium|large). A contained ButtonGroup removes top padding while preserving size-aware inline and bottom spacing.
-- Dialog: open, width, content-max-height, hide-header, style. Use hide-header for unified/headerless dialogs such as confirmations, or when custom body content provides the heading and dismissal path.
-- Drawer: open, variant (overlay|push|persistent|workspace), side (left|right), width, z-index, drawer-space, hide-header, breakpoint, style. For overlay, push, and persistent drawers, use open plus side to control visibility and placement. Push and persistent drawers use a direct child wrapper in slot="page" for adjacent page content; left-open, right-open, left-width, right-width, and the left/right slots are workspace-only. Use hide-header when drawer body content provides a custom header composition or custom dismissal controls. For a single side panel opened by a menu icon, prefer variant="push"; do not use workspace unless the UI is an advanced editor/canvas shell with independent left and right panels.
+- Dialog: open, width, max-height, hide-header, style. Use max-height to cap the complete surface while keeping the body scrollable. Use hide-header for unified/headerless dialogs such as confirmations, or when custom body content provides the heading and dismissal path.
+- Drawer: open, variant (overlay|push|persistent|workspace), side (left|right), width, height, z-index, panel-padding (default|none), hide-header, breakpoint, style. Use panel-padding="none" only when the drawer panel content owns its edge-to-edge spacing; when panel-padding="none" is used for custom action stacks, add padding="var(--space-400)" to the inner action VStack. It does not affect the adjacent page region. For overlay, push, and persistent drawers, use open plus side to control visibility and placement. Push and persistent drawers use a direct plain child wrapper in slot="page" for adjacent page content; left-open, right-open, left-width, right-width, and the left/right slots are workspace-only. Use hide-header when drawer body content or a global app header provides the shell chrome. For a single side panel opened by a menu icon, prefer variant="push"; do not use workspace unless the UI is an advanced editor/canvas shell with independent left and right panels. Drawer can be the root when it owns the full shell. When a global top header spans above it, make HeaderBar and Drawer siblings in a zero-space VStack root and size Drawer height to the remaining shell region. Preserve any explicit Drawer width and apply the same value to HeaderBar left-width so its menu/identity region aligns with the Drawer below; do not recreate HeaderBar layout with a Grid and manual shell styles.
 - Drawer workspace: variant=workspace, left-open, right-open, left-width, right-width, resize-rail, resize-min-drawer-width, resize-min-left-width, resize-min-right-width, resize-min-page-width, resize-close-threshold, height; slots left/page/right. Use when an editor/canvas has independent left and right panels around a central page. The page slot is also valid for push and persistent drawers; left/right slots and the paired left/right controls are workspace-only. Keep direct slot wrappers plain in HTML exports when possible.
-- Slat: variant (row|header|action), size (x-small|small|medium|large), col, space; child slots accessory/start/end. Medium is the default size. Action Slats pass size to their internal Button so the interactive row follows the matching action height. Always explicitly assign variant="row" for standard row slats unless creating a header (variant="header"), interactive row (variant="action"), or custom layout. When Slat is in SlatGroup or CardBody, variant ("row"|"header"|"action") is required to trigger automatic layout and alignment styles. Use col="1fr auto" by default; do not invent custom columns from an image prompt unless the source clearly requires non-default column tracks. Do not use header-start, header-end, row-start, row-end, action, or unslotted wrapper children. Put primary row content in a direct child with props.slot="start", trailing value/status/action content in a direct child with props.slot="end", and optional leading avatar/icon content in a direct child with props.slot="accessory".
+- HeaderBar: size (x-small|small|medium|large), left-width, right-width, bottom-border, surface (default|transparent), resize-rail, resize-min-column-width, resize-min-main-width, style; slots left/default/right. Use for top application shell and workspace headers. Slot left for a drawer-aligned menu/branding column, slot right for a panel-aligned profile/action column, and the default slot for main page search/title/actions. When resize-rail is present, populated side columns receive keyboard-accessible rail tracks that update left-width or right-width and emit mui-header-bar-resize-start, mui-header-bar-resize, and mui-header-bar-resize-end. Synchronize adjacent Drawer width from these events and mirror Drawer width changes back to HeaderBar. Use Responsive around complete HeaderBar alternatives for viewport shell changes, and a nested Responsive variant=container in the main slot when search/actions should react to the main column's available width. HeaderBar applies usage=header-bar to descendant Buttons and Dropdowns. Unsized Dropdowns inherit HeaderBar size; standard profile Buttons fill the bar height with square edges; circular and Avatar-only Buttons keep their action footprint; and Avatar/AvatarChip content follows Button size with its avatar footprint mapped to the matching action token. Explicit child sizes remain valid overrides. Column padding is composable via slotted containers/stacks using their padding props. HeaderBar height does not otherwise prescribe child density; use the Header Bar Composition Density Guide for compact, standard, spacious, notification, search, Dropdown, and AvatarChip starting points.
+- Slat: variant (row|header|action), size (x-small|small|medium|large), col, space; child slots accessory/start/end. Medium is the default size. Action Slats pass size to their internal Button so the interactive row follows the matching action height. Always explicitly assign variant="row" for standard row slats unless creating a header (variant="header"), interactive row (variant="action"), or custom layout. When Slat is in SlatGroup or CardBody, variant ("row"|"header"|"action") is required to trigger automatic layout and alignment styles. Use col="1fr auto" by default; do not invent custom columns from an image prompt unless the source clearly requires non-default column tracks. For multi-item progress rows with even alignment across rows, set col="minmax(0, 1fr) 7.5rem" (fixed end column for Status), put leading icon in slot="accessory", and in slot="start" use an HStack with a min-width label (e.g. style="min-width: 6rem;"), full-width Progress (style="width: 100%;"), and percentage label. Do not use header-start, header-end, row-start, row-end, action, or unslotted wrapper children. Put primary row content in a direct child with props.slot="start", trailing value/status/action content in a direct child with props.slot="end", and optional leading avatar/icon content in a direct child with props.slot="accessory".
 - SlatGroup: usage. When SlatGroup is inside CardBody, leave CardBody size unset by default; CardBody detects SlatGroup and applies the correct card spacing automatically.
 - SmartCard: state, number, variant, partner, type, logo, logo-height, bg-color, bg-image, inverted
 
 CONTENT:
 - Heading: text, size (1|2|3|4|5|6), level (1|2|3|4|5|6|none), truncate, clamp. Use level=none only for prominent values or display text that does not introduce a section; use levels 1-6 for structural headings.
-- Body: text, size (xx-small|x-small|small|medium|large), weight (regular|bold), variant (default|secondary|info|positive|warning|attention), truncate, clamp, style; use _Icon icon=mui-icon-info slot=before for lightweight inline guidance
+- Body: text, size (xx-small|x-small|small|medium|large), weight (regular|bold), variant (default|secondary|info|positive|warning|attention), truncate, clamp, style; use _Icon icon=mui-icon-info slot=before for lightweight inline guidance. Direct mui-link children automatically match the Body size.
 - Span: text, style; supports inline children such as Link
 - Code: size, scrollable
 - Quote: default text
 - Image: src, alt; slot caption
 - Avatar: label, image, icon, size (x-small|small|medium|large), background, backgroundColor
-- AvatarChip: primary, secondary, image, label, href, target, size (x-small|small|medium|large), usage (default|media-player); slots primary/secondary. Use for compact identity metadata with an avatar and one or two text/link lines. MediaPlayer applies usage=media-player automatically when slotted into media metadata.
+- AvatarChip: primary, secondary, image, label, href, target, size (x-small|small|medium|large), usage (default|media-player); slots primary/secondary. Use for compact identity metadata with an avatar and one or two text/link lines. MediaPlayer applies usage=media-player automatically when slotted into media metadata. For Button and Dropdown composition, follow the Avatar Chip Profile Actions fragment.
 - List: slot default
 - ListItem: text, variant, size (x-small|small|medium|large), weight (regular|bold)
 - _Icon: icon, size (xx-small|x-small|small|medium|large), color, slot. Before assigning an icon, inspect the available Muibook icon names and use an exact existing mui-icon-* value. If none semantically matches the requested concept, use icon=mui-icon-rectangle as the neutral Redactd fallback. Never invent an icon component or icon name.
 - _Illustration: illustration, size (x-small|small|medium|large|x-large), color, slot
-- Badge: text, variant (neutral|positive|warning|attention|overlay), size (xx-small|x-small|small|medium|large), color (grey|purple|violet|pink|magenta|red|orange|amber|yellow|lime|green|teal|cyan|blue|indigo|CSS background value). Secondary, default, and error are not Badge variants. Omit variant for the default neutral treatment. Use for compact non-interactive presentational metadata, counts, and lightweight state-like labels such as Offline, Online, Busy, Do not disturb, Beta, Default, IMG, or Shared when the surrounding UI already explains the object. Good inside cards, messages, chips, buttons, tabs, navigation, and hero or marketing surfaces. Use color to override the badge background only through theme-aware badge background tokens; do not use positive, warning, or attention just to get a different background colour.
+- Badge: required non-empty text, variant (neutral|positive|warning|attention|overlay), size (xx-small|x-small|small|medium|large), color (grey|purple|violet|pink|magenta|red|orange|amber|yellow|lime|green|teal|cyan|blue|indigo|CSS background value). Always provide `props.text` as a non-empty string after trimming; if no meaningful visible label is available, omit the Badge node entirely. Secondary, default, and error are not Badge variants. Omit variant for the default neutral treatment. Use for compact non-interactive presentational metadata, counts, and lightweight state-like labels such as Offline, Online, Busy, Do not disturb, Beta, Default, IMG, or Shared when the surrounding UI already explains the object. Good inside cards, messages, chips, buttons, tabs, navigation, and hero or marketing surfaces. Use color to override the badge background only through theme-aware badge background tokens; do not use positive, warning, or attention just to get a different background colour.
 - Status: text, variant (info|positive|warning|attention), color (grey|purple|violet|pink|magenta|red|orange|amber|yellow|lime|green|teal|cyan|blue|indigo), size (x-small|small|medium); slots before/after. Use for compact object or workflow state labels such as Active, Draft, Pending, Review, Blocked, or Synced when the value is the primary state of a record, workflow, or system, especially in tables, slats, dashboards, and data-heavy pages. Use x-small next to badges or in very dense context rows. Status is non-interactive by default, but can be interactive when composed as a trigger or compact state action. Omit variant for default low-emphasis grey status; use variant for semantic feedback and color for non-semantic categorical labels. Use action only when the status is a trigger. Do not use for counts, helper text, paragraph guidance, page-level notices, or decorative metadata.
 - Skeleton: loading, shape (line|rect|circle), size, animation (shimmer|pulse|none), lines, width, height, radius, gap, duration, line-widths, max-width, style
 - Table: size (xx-small|x-small|small|medium|large), slot default. Use for dense desktop data layouts. Setting size on Table propagates the density to its owned heading and body Rows; medium is the default.
 - RowGroup: heading; children Row.
-- Row: columns, size (xx-small|x-small|small|medium|large); children Cell.
-- Cell: action, align-y; children content or action controls.
+- Row: columns, space, aligny (start|center|end|stretch), size (xx-small|x-small|small|medium|large); children Cell.
+- Cell: action, alignx (start|center|end|space-between), aligny; children content or action controls.
 
 ACCORDION:
 - AccordionBlock: heading, level (1|2|3|4|5|6), size (xx-small|x-small|small|medium|large), detail-space. Level controls semantic document structure independently from size. Size controls heading typography, summary and detail spacing, and disclosure icon scale; medium is the default.
@@ -172,26 +178,27 @@ FORMS AND INPUTS:
 - FormSection: heading, hide-label, style
 - FormSectionFooter: slot, style
 - FormGroup: heading, variant (vertical|horizontal), hide-label, style
-- Field: label, variant (default|success|warning|error), message, hide-label, size (x-small|small|medium|large), optional, style
+- Field: label, description, variant (default|success|warning|error), message, hide-label, size (x-small|small|medium|large), optional, style. Field forwards description to its primary slotted control; keep rich slot=description content inside that control.
 - FormMessage: text, size (x-small|small|medium|large), weight (regular|bold), variant (secondary|info|positive|warning|attention), style
-- Input: label, type (text|email|password|number|tel|url), placeholder, value, id, name, disabled, hide-label, variant (default|error), size (x-small|small|medium|large), optional, max-length; slots before/after
-- Textarea: label, placeholder, value, name, id, variant (default|success|warning|error), size (x-small|small|medium|large), rows, optional, hide-label, max-length, disabled, style
-- Select: label, placeholder, options, value, id, name, disabled, variant (default|error), size (x-small|small|medium|large), appearance (native|custom), selected-content (rich|label), col, space, max-height, padding-block, padding-inline. Use options for simple data selects; use Option children only when appearance=custom needs rich composed native option content.
+- Input: label, description, type (text|email|password|number|tel|url), placeholder, value, id, name, disabled, hide-label, variant (default|error), size (x-small|small|medium|large), align (start|center|end), input-mode (decimal|numeric|text|email|url|search|tel|none), optional, max-length; slots description/before/after/inside-start/inside-end. Use align="end" and input-mode="decimal" for quantitative values (amounts, rates, balances, quantities) with currency/unit symbols in slot="inside-start" and slot="inside-end". Use description for persistent neutral guidance above the control. Use slot=description with mui-body when the copy needs rich inline content such as mui-link; Input owns the generated aria-describedby association. Use Field message for validation or status below the control.
+- Textarea: label, description, placeholder, value, name, id, variant (default|success|warning|error), size (x-small|small|medium|large), rows, optional, hide-label, max-length, disabled, style; slot description supports rich Body content
+- Select: label, description, placeholder, options, value, id, name, disabled, variant (default|error), size (x-small|small|medium|large), appearance (native|custom), selected-content (rich|label), col, space, max-height, padding-block, padding-inline; slot description supports rich Body content. Use options for simple data selects; use Option children only when appearance=custom needs rich composed native option content.
 - Option: value, label; children can contain layout/content for Select appearance=custom. Keep Option inside Select only.
 - Checkbox: text, checked, id, disabled, indeterminate, size (x-small|small|medium|large)
 - Radio: text, checked, disabled, id, name, value, aria-label, size (x-small|small|medium|large)
-- RadioGroup: name, value, label, size (x-small|small|medium|large), optional, hide-label, disabled
+- RadioGroup: name, value, label, description, size (x-small|small|medium|large), optional, hide-label, disabled; slot description supports rich Body content
 - Switch: label, checked, disabled, size (x-small|small|medium|large)
 - RangeInput: min, max, value, step, bubble, bubble-format (time), disabled
+- ColorInput: label, description, value, id, name, disabled, hide-label, hide-value, size (x-small|small|medium|large), gap, no-copy, copyable; slots description/before/after. Use for direct visual colour selection with a six-digit hexadecimal value. Slotted elements (such as mui-avatar, mui-badge, or custom swatches) automatically align to control height and inherit size.
 - ChipInput: label, placeholder, size (x-small|small|medium|large), placement (before|after), breakpoint, allow-custom, mobile-stack, hide-label, disabled, options, value, id
 - FileUpload: acceptedFileTypes, currentFileName
 - Addon: text, size (x-small|small|medium|large), slot (before|after), style
 
 ACTIONS:
-- Button: text, variant (primary|secondary|tertiary|overlay|attention), size (xx-small|x-small|small|medium|large), stroke (border|ring), stroke-ring-size (100|200|300|400|500), disabled, aria-label; slots default/before/after
+- Button: text, variant (primary|secondary|tertiary|overlay|attention), size (xx-small|x-small|small|medium|large), usage (input|header-bar), stroke (border|ring), stroke-ring-size (100|200|300|400|500), disabled, aria-label; slots default/before/after/badge
 - ButtonGroup: slot default, right, style
 - Link: text, href, variant (primary|secondary|tertiary|overlay|attention), size (xx-small|x-small|small|medium|large), stroke (border|ring), stroke-ring-size (100|200|300|400|500), target, download, weight (regular|bold), disabled; slots default/before/after
-- Dropdown: size (x-small|small|medium|large), zindex, position, vertical-position, persistent; slot action plus one direct Menu child. Dropdown enforces its size on the trigger and Menu. Do not place menu actions directly inside Dropdown.
+- Dropdown: size (x-small|small|medium|large), usage (header-bar), zindex, position, vertical-position, persistent; slot action plus one direct Menu child. Dropdown enforces its size on the trigger and Menu. With usage=header-bar, an unsized Dropdown inherits HeaderBar size and passes the context to its trigger. Do not place menu actions directly inside Dropdown. Follow the Avatar Chip Profile Actions fragment for profile triggers.
 - Menu: size (x-small|small|medium|large); direct Body, Button, Link, Input, Select, DatePicker, TimePicker, Textarea, SearchInput, RangeInput, and ChipInput children inherit Menu size. Menu applies size-based inset padding only to direct form-control hosts, without changing the Menu container inset. Direct Body receives action padding; Button and Link receive joined corner treatment.
 - Chip: text, active, dismiss, usage; slots default/before/after. Chip labels truncate when constrained; keep text short and let icons/dismiss controls remain visible.
 - ChipRail: size, aria-label; children Chip. Use for horizontally scrollable filters and category rails.
@@ -214,7 +221,7 @@ FEEDBACK:
 - Progress: progress, state
 
 MEDIA:
-- MediaPlayer: src, type (video|audio|youtube|soundcloud), controls (player|none), poster, artwork, media-title, height, waveform, center-play, loading, autoplay, muted, loop; slots meta-before/meta-after. Use meta-before for AvatarChip/title metadata and meta-after for overlay actions such as Subscribe or Buy now. Use variant=overlay on Button/Link actions when over video or artwork.
+- MediaPlayer: src, type (video|audio|youtube|soundcloud), controls (player|none), poster, artwork, media-title, height, no-radius, waveform, center-play, loading, autoplay, muted, loop; slots meta-before/meta-after. Use no-radius only for flush or edge-to-edge compositions where the containing surface owns the corner treatment. Use meta-before for AvatarChip/title metadata and meta-after for overlay actions such as Subscribe or Buy now. Use variant=overlay on Button/Link actions when over video or artwork.
 - VideoThumbnail: src, src-light, src-dark, src-mui-light, src-mui-dark, src-jal-light, src-jal-dark, src-ana-light, src-ana-dark, src-sensei-light, src-sensei-dark, src-paperclip-light, src-paperclip-dark, alt, play, overlay. Use inside video cards when the thumbnail needs to react to brand and light/dark theme.
 - ModelViewer: src, ios-src, poster, alt, controls, camera-controls, auto-rotate, ar, loading; slots default/poster. Always include alt and fallback content when a model is important to understanding the page.
 
@@ -226,6 +233,12 @@ PROMPT COMPONENTS:
 
 PRESENTATION:
 - SlideFrame: title, footer-text, ratio (16:9|4:3|1:1|3:2|9:16), present, active-section, padding, variant (default|plain), radius, notes-open, hide-header, hide-footer, hide-counter, allow-add-section, fullscreen, scroll, style
+
+CHARTS:
+- ComparisonChart: mode (absolute|indexed|percent), label, scale (both|time|price|none), height, currency, value-format (currency|percent|decimal), interactive, attribution (logo|none), series; slots header/legend/footer. When embedding in a Card, always use Card size="none" usage="grid" > CardBody size="none" > ComparisonChart. Never use CardHeader or table headers above/inside charts; ComparisonChart provides its own native padded slot="header" region and plot divider strokes. Compose the chart header with an HStack (alignX="space-between", alignY="center", space="var(--space-300)") containing a section Heading on the start/left and action controls (such as a small secondary Button with trailing mui-icon-down-chevron) on the end/right.
+- FinancialBarChart: label, value-format (currency|percent|decimal), height, scale (both|time|price|none), interactive, data; slots header/footer. When embedding in a Card, use Card size="none" usage="grid" > CardBody size="none" > FinancialBarChart with slot="header".
+- FinancialChart: label, height, data; slot header. For candlestick/OHLC market data.
+- MarketSparkline: label, height, scale (none|both|time|price), interactive, data; slot header. Compact sparkline trend.
 
 
 ## Structured Chart Data
@@ -513,9 +526,13 @@ every child merely because it appears in an example.
   the header; use a separate child with `props.slot: "legend"` when the legend needs its own row or
   independent layout. Whichever placement is chosen, label every supplied series and keep legend
   colors consistent with the series.
-- `FinancialBarChart` and `ComparisonChart` provide their own padded header region. Add local
-  padding to a Market Sparkline header only when its surrounding Card or layout does not already
-  provide the needed inset. Do not copy example padding or spacing without considering the parent.
+- `FinancialBarChart` and `ComparisonChart` provide their own native padded header region and divider strokes.
+  **Never use `CardHeader` or a table header (`RowGroup[heading]`) above or inside the chart**.
+  Placing a `CardHeader` above a chart causes duplicate headers, conflicting borders, and mismatched padding.
+- When embedding a chart in a Card, use `Card` with `size: "none"` and `usage: "grid"`, containing a direct child `CardBody` with `size: "none"` wrapping the chart. Let the chart own the full card boundary, internal header padding, and plot divider.
+- Compose the chart header directly in `props.slot: "header"` using an `HStack` (or `Stack`) with `alignX: "space-between"`, `alignY: "center"`, and `space: "var(--space-300)"` or `"var(--space-400)"`:
+  - **Start (Left)**: Section `Heading` (e.g. `size="4"`, `level="2"`) or a title + subtitle stack.
+  - **End (Right)**: Interactive controls or range selector — such as a timeframe `Dropdown` (`position: "right"`, `size: "small"`) containing a trigger `Button` (`slot: "action"`, `size="small"`, `variant="secondary"`, e.g. text `"This week"`, with trailing dropdown `_Icon` `mui-icon-down-chevron` `size="x-small"` in `slot="after"`) and a `Menu` with action options ("Today", "This week", "Last 30 days", "Year to date").
 - Use `header-stroke` on Financial Bar Chart or Comparison Chart only when the requested composition
   should visually join the populated header to the plot without the default divider.
 
@@ -724,6 +741,542 @@ Example Comparison Chart with a compact legend composed into the header:
   ]
 }
 ```
+
+Example Card-Embedded Comparison Chart with section heading and trailing timeframe action:
+
+```json
+{
+  "id": "revenue_card",
+  "type": "Card",
+  "props": {
+    "size": "none",
+    "usage": "grid"
+  },
+  "children": [
+    {
+      "id": "revenue_card_body",
+      "type": "CardBody",
+      "props": {
+        "size": "none"
+      },
+      "children": [
+        {
+          "id": "revenue_comparison_chart",
+          "type": "ComparisonChart",
+          "props": {
+            "mode": "absolute",
+            "label": "Revenue for May 12 to May 18, 2024",
+            "scale": "both",
+            "height": "35rem",
+            "currency": "USD",
+            "attribution": "none",
+            "interactive": true,
+            "value-format": "currency",
+            "series": [
+              {
+                "id": "revenue",
+                "label": "Revenue",
+                "data": [
+                  { "time": "2024-05-12", "value": 12500 },
+                  { "time": "2024-05-13", "value": 19000 },
+                  { "time": "2024-05-14", "value": 16000 },
+                  { "time": "2024-05-15", "value": 24000 },
+                  { "time": "2024-05-16", "value": 17500 },
+                  { "time": "2024-05-17", "value": 14500 },
+                  { "time": "2024-05-18", "value": 27000 }
+                ]
+              }
+            ]
+          },
+          "children": [
+            {
+              "id": "revenue_chart_header",
+              "type": "HStack",
+              "props": {
+                "slot": "header",
+                "space": "var(--space-300)",
+                "width": "auto",
+                "height": "auto",
+                "alignX": "space-between",
+                "alignY": "center"
+              },
+              "children": [
+                {
+                  "id": "revenue_chart_title",
+                  "type": "Heading",
+                  "props": {
+                    "size": "4",
+                    "text": "Overview",
+                    "level": "2"
+                  },
+                  "children": []
+                },
+                {
+                  "id": "revenue_timeframe_dropdown",
+                  "type": "Dropdown",
+                  "props": {
+                    "position": "right",
+                    "size": "small"
+                  },
+                  "children": [
+                    {
+                      "id": "revenue_timeframe_button",
+                      "type": "Button",
+                      "props": {
+                        "slot": "action",
+                        "size": "small",
+                        "text": "This week",
+                        "variant": "secondary"
+                      },
+                      "children": [
+                        {
+                          "id": "revenue_timeframe_chevron",
+                          "type": "_Icon",
+                          "props": {
+                            "icon": "mui-icon-down-chevron",
+                            "size": "x-small",
+                            "slot": "after"
+                          },
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "id": "revenue_timeframe_menu",
+                      "type": "Menu",
+                      "props": {
+                        "width": "12rem"
+                      },
+                      "children": [
+                        { "id": "timeframe_today", "type": "Button", "props": { "text": "Today", "variant": "tertiary", "align": "start" }, "children": [] },
+                        { "id": "timeframe_week", "type": "Button", "props": { "text": "This week", "variant": "tertiary", "align": "start" }, "children": [] },
+                        { "id": "timeframe_month", "type": "Button", "props": { "text": "Last 30 days", "variant": "tertiary", "align": "start" }, "children": [] },
+                        { "id": "timeframe_ytd", "type": "Button", "props": { "text": "Year to date", "variant": "tertiary", "align": "start" }, "children": [] }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+```
+
+
+
+## Header Bar With Drawer Region
+
+Treat a global top header plus side drawer as an app-shell fragment. The top header and Drawer are
+siblings inside one vertical shell so opening a push Drawer affects only the Drawer page region, not
+the global header above it.
+
+- Use a `VStack` shell with zero spacing when the header spans the full application width.
+- Place `HeaderBar` first. When the Drawer has an explicit width such as `320px`, use that same value
+  for `HeaderBar.props.left-width`. Keep the explicit value on Drawer; do not omit or replace the
+  configured Drawer width.
+- Use a child with `props.slot: "left"` as the Drawer-aligned header region, commonly containing the
+  menu (or “hamburger”) action button with circular shape (`shape: "circle"`, `variant: "tertiary"`)
+  and product identity. Use icon-only buttons with `shape: "circle"` for top header bar actions such as
+  menu toggle, search, settings, and notifications.
+- Set `HeaderBar.props.size` instead of manually assigning height tokens. Use `bottom-border: true`
+  when the shell needs the standard separator and let HeaderBar own its surface and column borders.
+- Put search, page identity, and primary actions in HeaderBar's default region. Use `props.slot: "right"`
+  only for a separately aligned right panel region. Follow the Header Bar Composition Density Guide
+  for action, SearchInput, Dropdown, AvatarChip, and responsive choices.
+- Place the `Drawer` second. When the shell fills the viewport, set Drawer height to
+  `calc(100dvh - var(--header-min-height-medium))` so the combined header and drawer region do not
+  exceed the viewport.
+- Keep Drawer navigation in its default slot. When using `panel-padding="none"` on Drawer (recommended for custom action stacks), add `padding="var(--space-400)"` to the `VStack` housing the action items so navigation links/buttons have proper inset. For navigation items, use tertiary Button or Link actions with `align: "start"`, `gap: "var(--space-200)"` (for medium buttons), and exact Muibook icons in `props.slot: "before"` when icons are useful. Do not add redundant section titles like "Navigation".
+- Wrap adjacent page content in a plain direct `Div` child with `props.slot: "page"`; compose
+  Container, Stack, Grid, and product content inside that wrapper.
+- Use `hide-header: true` when the global header owns the shell chrome and the Drawer does not need
+  its built-in title/close row. Do not also generate a hidden Drawer `title` child.
+- Keep every slot only in `props.slot`; never add `slot` beside `id`, `type`, `props`, or `children`.
+- If the HeaderBar should move with or belong only to the page region, place it inside the Drawer page
+  wrapper instead. If there is no global header, Drawer can remain the root node.
+
+## Header Bar Composition Density Guide
+
+Treat these as starting points for coherent sizing, not fixed recipes. Header Bar content density can
+change with the product, available width, action priority, input purpose, and whether identity copy
+needs to remain visible. Components inside HeaderBar keep their own public size APIs; HeaderBar size
+controls the bar height but does not require every child to use the same size.
+
+### Standard application shell
+
+- Start with `HeaderBar size="medium"` and a primary `SearchInput size="medium"`.
+- Use circular icon-only Buttons for menu, search, settings, and notification actions. Tertiary is a
+  quiet default; secondary is useful when an action needs a clearer boundary, especially a
+  notification action carrying a Badge.
+- A common notification composition is a `Button variant="secondary" shape="circle"` with an exact
+  notification icon and `Badge slot="badge" variant="attention"`. Badge size and placement are
+  inherited from Button; do not set them manually unless the design deliberately departs from the
+  automatic scale.
+- A common profile composition is an unsized Dropdown containing a tertiary action Button, an
+  unsized AvatarChip, and a down-chevron in `slot="after"`. HeaderBar applies `usage="header-bar"`;
+  Dropdown inherits HeaderBar size and passes it to Button, which passes it to AvatarChip. Let the
+  chevron inherit its size. Follow the Avatar Chip Profile Actions fragment for the complete tree.
+  Use `gap="var(--space-400)"` when the identity copy and chevron need the demonstrated Header Bar
+  spacing.
+- Group the notification Button and profile Dropdown in an `HStack` with
+  `space="var(--space-500)"` for the demonstrated standard composition. This is a recommended
+  separation between distinct controls, not a required HeaderBar spacing value.
+- When that full-height profile Dropdown is the final control in HeaderBar's main region, keep only
+  the main region's left inset and let the profile action meet the right edge. If the Dropdown is the
+  terminal content of `slot="right"`, its wrapper does not need additional padding.
+
+### Compact shell or constrained main column
+
+- Use `HeaderBar size="x-small"` or `size="small"` when the whole shell is intentionally dense.
+- Search may use `SearchInput size="small"`, an icon-only circular search Button, or move into a
+  separate surface. Choose based on whether search must remain immediately editable.
+- Keep supporting actions at x-small or small density. Tertiary actions reduce visual weight;
+  secondary actions retain a visible boundary.
+- Use `Dropdown size="x-small"` or `size="small"` with a matching AvatarChip when profile copy still
+  fits. Use an avatar-only circular trigger when the compact layout cannot support both identity
+  lines.
+
+### Spacious or workspace shell
+
+- Use `HeaderBar size="large"` when the header carries workspace context, larger identity, or a more
+  prominent command region.
+- Search can remain medium for familiar control density or increase to large when it is the dominant
+  task. Do not enlarge it solely because HeaderBar is large.
+- Actions and profile controls may remain medium while HeaderBar supplies the extra surrounding
+  space. Increase AvatarChip or Dropdown size only when the identity treatment benefits from the
+  added emphasis.
+
+### Responsive composition choices
+
+- Use Responsive around complete HeaderBar alternatives when the app-shell structure changes at a
+  viewport breakpoint.
+- Use nested `Responsive variant="container"` inside the main HeaderBar region when only search and
+  action composition should react to the available main-column width.
+- A compact alternative can replace an editable SearchInput with a search action and replace an
+  AvatarChip Dropdown trigger with an avatar-only trigger. These are options, not mandatory mobile
+  substitutions.
+- Prefer one live control tree when state must be preserved. Do not duplicate stateful search,
+  menus, form controls, IDs, or other state merely to create a visual breakpoint.
+
+Composition options can be mixed. For example, a medium HeaderBar can explicitly use a small profile Dropdown,
+a medium SearchInput, and medium circular actions; another valid product may use tertiary actions,
+an avatar-only profile trigger, or no search at all.
+
+Reference fragment (adapt the labels and page content to the requested product):
+
+```json
+{
+  "id": "application_shell",
+  "type": "VStack",
+  "props": {
+    "space": "var(--space-000)",
+    "alignX": "stretch",
+    "width": "100%",
+    "height": "100dvh"
+  },
+  "children": [
+    {
+      "id": "application_header",
+      "type": "HeaderBar",
+      "props": {
+        "size": "medium",
+        "left-width": "320px",
+        "bottom-border": true
+      },
+      "children": [
+        {
+          "id": "application_drawer_header",
+          "type": "HStack",
+          "props": {
+            "space": "var(--space-200)",
+            "alignX": "start",
+            "alignY": "center",
+            "width": "auto",
+            "height": "auto",
+            "padding": "0 var(--space-400)",
+            "slot": "left"
+          },
+          "children": [
+            {
+              "id": "application_menu_action",
+              "type": "Button",
+              "props": {
+                "variant": "tertiary",
+                "shape": "circle",
+                "aria-label": "Toggle navigation"
+              },
+              "children": [
+                {
+                  "id": "application_menu_icon",
+                  "type": "_Icon",
+                  "props": {
+                    "icon": "mui-icon-menu",
+                    "size": "medium"
+                  },
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "application_name",
+              "type": "Heading",
+              "props": {
+                "text": "Application",
+                "size": "4",
+                "level": "1"
+              },
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "application_page_header",
+          "type": "HStack",
+          "props": {
+            "space": "var(--space-300)",
+            "alignX": "space-between",
+            "alignY": "center",
+            "width": "auto",
+            "height": "auto",
+            "padding": "0 var(--space-500)"
+          },
+          "children": [
+            {
+              "id": "application_page_header_title",
+              "type": "Heading",
+              "props": {
+                "text": "Page title",
+                "size": "4",
+                "level": "2"
+              },
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "application_navigation_drawer",
+      "type": "Drawer",
+      "props": {
+        "open": true,
+        "variant": "push",
+        "side": "left",
+        "width": "320px",
+        "hide-header": true,
+        "height": "calc(100dvh - var(--header-min-height-medium))",
+        "panel-padding": "none",
+        "style": "background: var(--surface);"
+      },
+      "children": [
+        {
+          "id": "application_navigation",
+          "type": "VStack",
+          "props": {
+            "space": "var(--space-100)",
+            "padding": "var(--space-300)",
+            "alignX": "stretch",
+            "width": "auto",
+            "height": "auto"
+          },
+          "children": [
+            {
+              "id": "application_home_link",
+              "type": "Button",
+              "props": {
+                "text": "Home",
+                "variant": "tertiary",
+                "align": "start",
+                "gap": "var(--space-200)"
+              },
+              "children": [
+                {
+                  "id": "application_home_icon",
+                  "type": "_Icon",
+                  "props": {
+                    "icon": "mui-icon-home",
+                    "slot": "before"
+                  },
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "application_settings_link",
+              "type": "Button",
+              "props": {
+                "text": "Settings",
+                "variant": "tertiary",
+                "align": "start",
+                "gap": "var(--space-200)"
+              },
+              "children": [
+                {
+                  "id": "application_settings_icon",
+                  "type": "_Icon",
+                  "props": {
+                    "icon": "mui-icon-gear",
+                    "slot": "before"
+                  },
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "application_page_region",
+          "type": "Div",
+          "props": {
+            "slot": "page"
+          },
+          "children": [
+            {
+              "id": "application_page_container",
+              "type": "Container",
+              "props": {
+                "center": true,
+                "size": "fluid",
+                "style": "padding-block: var(--space-600);"
+              },
+              "children": [
+                {
+                  "id": "application_page_content",
+                  "type": "VStack",
+                  "props": {
+                    "space": "var(--space-300)",
+                    "alignX": "stretch",
+                    "width": "auto",
+                    "height": "auto"
+                  },
+                  "children": [
+                    {
+                      "id": "application_page_heading",
+                      "type": "Heading",
+                      "props": {
+                        "text": "Page content",
+                        "size": "2",
+                        "level": "3"
+                      },
+                      "children": []
+                    },
+                    {
+                      "id": "application_page_description",
+                      "type": "Body",
+                      "props": {
+                        "text": "Compose the requested page content in this region.",
+                        "variant": "secondary"
+                      },
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+```
+
+
+## Avatar Chip Profile Actions
+
+Use AvatarChip when avatar, primary identity, and optional secondary identity should travel as one
+profile trigger. AvatarChip owns identity layout; Button owns interaction, Dropdown owns disclosure,
+and Menu owns account actions.
+
+### Owned by AvatarChip
+
+- Internal Avatar rendering, including image, initials fallback, label, and background treatment.
+- Primary and secondary identity layout, whether supplied through the simple `primary` and
+  `secondary` props or the matching named slots.
+- The internal gap and alignment between Avatar and identity copy.
+- Coordinated Avatar, primary text, and secondary text scaling from AvatarChip size.
+
+### Composed by the consumer
+
+- Button semantics, accessible action label, visual variant, action size, and interaction states.
+- Dropdown placement, disclosure state, and propagation of density to its action Button and Menu.
+- The optional down-chevron in Button's `after` slot. It is not part of AvatarChip.
+- Menu structure and its Profile, Settings, Sign out, or product-specific actions.
+- Layout around the control, including its relationship to notification and search actions.
+- Responsive replacement with an Avatar-only trigger when the identity copy no longer fits.
+
+Do not add custom HStacks, Avatars, or text wrappers inside Button to reproduce the identity row that
+AvatarChip already owns. Conversely, do not expect AvatarChip itself to provide Button, Dropdown,
+chevron, Menu, or responsive disclosure behavior.
+
+### Composition rules
+
+- A profile Dropdown must contain one Button with `props.slot: "action"` and one direct Menu child.
+  Put AvatarChip inside the action Button; never place AvatarChip directly inside Dropdown.
+- Add a down-chevron with `props.slot: "after"` when the trigger needs an explicit menu affordance.
+  Omit chevron size so Button can apply its scale.
+- Outside HeaderBar, set Dropdown size when a deliberate density is required. Dropdown passes its
+  size to the trigger Button and Menu. AvatarChip may match that size explicitly; Button also keeps
+  composed AvatarChip density aligned.
+- `variant: "secondary"` gives a standalone profile action a visible boundary. `variant: "tertiary"`
+  is a valid quieter option and is the demonstrated HeaderBar treatment. Choose emphasis from the
+  surrounding action hierarchy rather than treating either variant as mandatory.
+- Inside HeaderBar, prefer leaving Dropdown, Button, AvatarChip, chevron, and Menu unsized when they
+  should inherit HeaderBar density. HeaderBar applies the contextual usage, Dropdown propagates size,
+  and AvatarChip maps its internal Avatar footprint to the matching action token.
+- In the demonstrated HeaderBar composition, use `gap: "var(--space-400)"` on the profile Button.
+  Button supplies size-aware logical edge spacing for AvatarChip and its trailing chevron.
+- When identity copy does not fit, use an Avatar-only action Button inside Dropdown. The Button size
+  remains authoritative and the Avatar adopts the matching action footprint. Avatar-only HeaderBar
+  actions stay compact rather than stretching to the full HeaderBar height.
+
+General profile Dropdown:
+
+```json
+{
+  "id": "profile_dropdown",
+  "type": "Dropdown",
+  "props": { "position": "right", "size": "medium" },
+  "children": [
+    {
+      "id": "profile_action",
+      "type": "Button",
+      "props": { "slot": "action", "variant": "secondary", "aria-label": "Open profile menu" },
+      "children": [
+        {
+          "id": "profile_identity",
+          "type": "AvatarChip",
+          "props": { "label": "Alex", "primary": "Alex Hurt", "secondary": "Product Designer" },
+          "children": []
+        },
+        {
+          "id": "profile_chevron",
+          "type": "_Icon",
+          "props": { "icon": "mui-icon-down-chevron", "slot": "after" },
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": "profile_menu",
+      "type": "Menu",
+      "props": { "width": "16rem" },
+      "children": [
+        { "id": "profile_item", "type": "Button", "props": { "text": "Profile", "variant": "tertiary", "align": "start" }, "children": [] },
+        { "id": "settings_item", "type": "Button", "props": { "text": "Settings", "variant": "tertiary", "align": "start" }, "children": [] },
+        { "id": "sign_out_item", "type": "Button", "props": { "text": "Sign out", "variant": "tertiary", "align": "start" }, "children": [] }
+      ]
+    }
+  ]
+}
+```
+
+Within HeaderBar, use the same tree without authored sizes and normally change the action Button to
+`variant: "tertiary"` with `gap: "var(--space-400)"`.
 
 
 ## Spacing Values
